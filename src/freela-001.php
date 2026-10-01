@@ -1,7 +1,6 @@
 <?php
 $caminhoArquivo = 'src\produtos.json';
 $opcao = '';
-
 echo "====================================\n";
 echo "GESTOR FÁCIL\n";
 echo "====================================\n";
@@ -47,6 +46,7 @@ function adicionarProduto(array $produto, string $caminhoArquivo, array $produto
         ),
         LOCK_EX
     );
+    echo "Produto Cadastrado com sucesso!\n\n";
 }
 
 function cadastrarProduto(string $caminhoArquivo)
@@ -85,8 +85,49 @@ function cadastrarProduto(string $caminhoArquivo)
     adicionarProduto($produto, $caminhoArquivo, $produtos);
 }
 
+function listarProdutos(string $caminhoArquivo)
+{
+    $produtos = abrirArquivo($caminhoArquivo);
+    if (empty($produtos)) {
+        return;
+    }
+    echo "LISTAGEM DE PRODUTOS:";
+    foreach ($produtos as $produto) {
+        echo "\n-------------------------\n";
+        echo "\nID: " . $produto["id"];
+        echo "\nNome: " . $produto["nome"];
+        echo "\nPreço: R$ " . number_format($produto["preco"], 2, ',', '.');
+        echo "\nQuantidade: " . $produto["quantidade"];
+        echo "\nCategoria: " . $produto["categoria"];
+    }
+}
+
+function buscarProduto(string $caminhoArquivo)
+{
+    echo "Digite o nome do produto: ";
+    $nmProduto = trim(fgets(STDIN));
+    $produtos = abrirArquivo($caminhoArquivo);
+    $verifica = 0;
+    foreach ($produtos as $produto) {
+        $nmProduto = strtolower($nmProduto);
+        $nmProdutoJson = strtolower($produto["nome"]);
+        if (str_contains($nmProdutoJson, $nmProduto)) {
+            echo "\n-------------------------\n";
+            echo "\nID: " . $produto["id"];
+            echo "\nNome: " . $produto["nome"];
+            echo "\nPreço: R$ " . number_format($produto["preco"], 2, ',', '.');
+            echo "\nQuantidade: " . $produto["quantidade"];
+            echo "\nCategoria: " . $produto["categoria"];
+            $verifica += 1;
+        }
+    }
+    if ($verifica == 0) {
+        echo "Nenhum produto foi localizado!\n";
+    }
+}
+
 do {
-    echo "Escolha: ";
+    echo "\nEscolha: ";
 
     $opcao = trim(fgets(STDIN));
 
@@ -97,7 +138,12 @@ do {
         case '1':
             cadastrarProduto($caminhoArquivo);
             break;
-
+        case '2':
+            listarProdutos($caminhoArquivo);
+            break;
+        case '3':
+            buscarProduto($caminhoArquivo);
+            break;
         default:
             echo "Opção invalida.\n";
             break;
